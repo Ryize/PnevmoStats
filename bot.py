@@ -17,6 +17,9 @@ SHOOT_DATA = {}
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
+    """
+    Запуск бота командой /start
+    """
     chat_id = message.chat.id
     with open('graphs/base_graph.png', 'rb') as file:
         file_data = file.read()
@@ -30,6 +33,9 @@ def welcome(message):
     func=lambda message: message.text == BUTTON_START_SHOOTING
 )
 def start_shoot(message):
+    """
+    Выбрана Reply кнопка начала замеров
+    """
     chat_id = message.chat.id
     SHOOT_DATA[chat_id] = {}
     bot.send_message(chat_id,
@@ -39,6 +45,9 @@ def start_shoot(message):
 
 
 def send_pressure(message):
+    """
+    Отправка сообщения об указании давления.
+    """
     chat_id = message.chat.id
     bot.send_message(chat_id,
                      PRESSURE_SAVE_START,
@@ -47,6 +56,9 @@ def send_pressure(message):
 
 
 def save_pressure(message):
+    """
+    Сохранение давления.
+    """
     pressure: str = message.text
     chat_id = message.chat.id
     if not pressure.isdigit():
@@ -58,12 +70,18 @@ def save_pressure(message):
 
 
 def send_speed(message):
+    """
+    Отправка сообщения об указании скорости.
+    """
     chat_id = message.chat.id
     bot.send_message(chat_id, SPEED_SAVE_START)
     bot.register_next_step_handler(message, save_speed)
 
 
 def save_speed(message):
+    """
+    Сохранение скорости.
+    """
     speed: str = message.text
     chat_id = message.chat.id
     if not speed.replace('.', '', 1).isdigit():
@@ -80,6 +98,9 @@ def save_speed(message):
 
 
 def choose_action(message):
+    """
+    Выбор действия: продолжить замеры или построить график.
+    """
     chat_id = message.chat.id
     text = message.text
     if text == BUTTON_CONTINUE_SHOOTING:
@@ -94,6 +115,9 @@ def choose_action(message):
 
 
 def send_graph_start(message):
+    """
+    Выбрана действие постоение графика.
+    """
     chat_id = message.chat.id
     bot.send_message(chat_id,
                      REVERSE_GRAPH,
@@ -102,12 +126,14 @@ def send_graph_start(message):
 
 
 def send_graph_end(message):
+    """
+    Создание и отправка графика.
+    """
     chat_id = message.chat.id
     status = True if message.text == REVERSE_YES else False
     bot.send_message(chat_id,
                      GRAPH_START,
                      reply_markup=keyboards.get_empty_keyboard())
-    print(SHOOT_DATA[chat_id])
     img_path = get_graph(SHOOT_DATA[chat_id], status)
     bot.send_message(chat_id,
                      GRAPH_END)
